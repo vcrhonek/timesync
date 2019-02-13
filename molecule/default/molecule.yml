@@ -1,0 +1,67 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: openstack
+lint:
+  name: yamllint
+# Define OpenStack images
+platforms:
+  - name: "molecule-timesync-centos-6"
+    image: "CentOS-6-x86_64-GenericCloud-released-latest"
+    flavor: "m1.small"
+  - name: "molecule-timesync-centos-7"
+    image: "CentOS-7-x86_64-GenericCloud-released-latest"
+    flavor: "m1.small"
+  - name: "molecule-timesync-fedora-28"
+    image: "Fedora 28"
+    flavor: "m1.small"
+  - name: "molecule-timesync-fedora-29"
+    image: "Fedora 29"
+    flavor: "m1.small"
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  # We need to login as a particular user on CentOS/Fedora
+  inventory:
+    host_vars:
+      molecule-timesync-centos-6:
+        ansible_user: "centos"
+        ansible_become: true
+      molecule-timesync-centos-7:
+        ansible_user: "centos"
+        ansible_become: true
+      molecule-timesync-fedora-28:
+        ansible_user: "fedora"
+        ansible_become: true
+      molecule-timesync-fedora-29:
+        ansible_user: "fedora"
+        ansible_become: true
+  # Don't run default playbook.yml, but our test playbook
+  playbooks:
+    converge: ../../tests/tests_default.yml
+scenario:
+  name: default
+  # Disable some steps, we don't need them
+  # TODO: lint should be enabled
+  test_sequence:
+    # - lint
+    - destroy
+    # - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    # - idempotence
+    # - side_effect
+    # - verify
+    - destroy
+verifier:
+  name: testinfra
+  lint:
+    name: flake8
+  # In case we do "verify" step in future, make it
+  # more verbose
+  options:
+    v: 1

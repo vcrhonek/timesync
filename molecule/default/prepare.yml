@@ -1,0 +1,11 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install python for Ansible
+      # TODO: update?, libselinux-python
+      #raw: test -e /usr/bin/python || (dnf -y update && dnf install -y python2 libselinux-python)
+      raw: test -e /usr/bin/python || (dnf install -y python2 libselinux-python)
+      become: true
+      changed_when: false
