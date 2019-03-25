@@ -1,0 +1,32 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+platforms:
+  # TODO: use different/create own image?
+  - name: centos7
+    image: milcom/centos7-systemd
+    privileged: true
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  playbooks:
+    converge: ../../tests/tests_default.yml
+scenario:
+  name: default
+  test_sequence:
+    - lint
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - destroy
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

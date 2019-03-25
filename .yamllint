@@ -1,0 +1,14 @@
+extends: default
+
+rules:
+  braces:
+    max-spaces-inside: 1
+    level: error
+  brackets:
+    max-spaces-inside: 1
+    level: error
+  line-length: disable
+  truthy: disable
+  # TODO: do we want to test document-start?
+  # (it fails at the moment in vars/main.yml)
+  document-start: disable
