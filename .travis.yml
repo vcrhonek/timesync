@@ -1,0 +1,10 @@
+---
+language: generic
+services:
+  - docker
+install:
+  - pip install molecule docker
+script:
+  - molecule --version
+  - ansible --version
+  - molecule test
