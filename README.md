@@ -1,7 +1,7 @@
 timesync
 ========
 
-[![Build Status](https://travis-ci.org/vcrhonek/timesync.svg?branch=molecule-docker-default-test)](https://travis-ci.org/vcrhonek/timesync)
+[![Build Status](https://travis-ci.com/vcrhonek/timesync.svg?branch=molecule-docker-default-test)](https://travis-ci.com/vcrhonek/timesync)
 
 This role installs and configures an NTP and/or PTP implementation to operate
 as an NTP client and/or PTP slave in order to synchronize the system clock with
