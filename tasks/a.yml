@@ -1,0 +1,20 @@
+---
+
+- name: Install linuxptp
+  package:
+    name: linuxptp
+    state: present
+  when: timesync_mode != 1
+
+- name: Run phc_ctl on PTP interface
+  command: phc_ctl -q {{ timesync_ptp_domains[0].interfaces[0] }}
+  register: timesync_phc_ctl_output
+  changed_when: false
+  check_mode: false
+  when: timesync_mode == 2
+  ignore_errors: true
+
+- name: Check if PTP interface supports HW timestamping
+  set_fact:
+    timesync_mode2_hwts: "{{ timesync_phc_ctl_output.rc == 0 }}"
+  when: timesync_mode == 2

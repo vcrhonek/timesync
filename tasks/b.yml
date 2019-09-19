@@ -1,0 +1,51 @@
+---
+
+- name: Generate ptp4l.conf file
+  template:
+    src: ptp4l.conf.j2
+    dest: /etc/ptp4l.conf
+    backup: true
+    mode: 0644
+  notify: restart ptp4l
+  when: timesync_mode == 2
+
+- name: Generate ptp4l sysconfig file
+  template:
+    src: ptp4l.sysconfig.j2
+    dest: /etc/sysconfig/ptp4l
+    backup: true
+    mode: 0644
+  notify: restart ptp4l
+  when: timesync_mode == 2
+
+- name: Generate phc2sys sysconfig file
+  template:
+    src: phc2sys.sysconfig.j2
+    dest: /etc/sysconfig/phc2sys
+    backup: true
+    mode: 0644
+  notify: restart phc2sys
+  when:
+    - timesync_mode == 2
+    - timesync_mode2_hwts
+
+- name: Generate timemaster.conf file
+  template:
+    src: timemaster.conf.j2
+    dest: /etc/timemaster.conf
+    backup: true
+    mode: 0644
+  notify: restart timemaster
+  when: timesync_mode == 3
+
+- name: Update network sysconfig file
+  lineinfile:
+    dest: /etc/sysconfig/network
+    create: true
+    backup: true
+    mode: 0644
+    regexp: '^PEERNTP='
+    line: 'PEERNTP=no'
+    state: "{{ 'absent' if timesync_dhcp_ntp_servers else 'present' }}"
+  notify: restart {{ timesync_ntp_provider + 'd' }}
+  when: timesync_mode == 1

@@ -1,0 +1,59 @@
+---
+
+- name: Install chrony
+  package:
+    name: chrony
+    state: present
+  when:
+    - timesync_mode != 2
+
+- import_tasks: a.yml
+
+- name: Get chrony version
+  command: rpm -q --qf '%{version}' chrony
+  args:
+    warn: false
+  register: timesync_chrony_version
+  changed_when: false
+  check_mode: false
+  when:
+    - timesync_mode != 2
+
+- name: Generate chrony.conf file
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    backup: true
+    mode: 0644
+  notify: restart {{ 'chronyd' if timesync_mode == 1 else 'timemaster' }}
+  when:
+    - timesync_mode != 2
+
+- name: Generate chronyd sysconfig file
+  template:
+    src: chronyd.sysconfig.j2
+    dest: /etc/sysconfig/chronyd
+    backup: true
+    mode: 0644
+  notify: restart chronyd
+  when:
+    - timesync_mode == 1
+
+- import_tasks: b.yml
+
+- name: Disable ntpd
+  service:
+    name: ntpd
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- import_tasks: c.yml
+
+- name: Enable chronyd
+  service:
+    name: chronyd
+    state: started
+    enabled: true
+  when:
+    - timesync_mode == 1
